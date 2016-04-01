@@ -1,9 +1,10 @@
 #include "common.h"
 #include "sysutil.h"
+#include "threadpool.h"
 
 extern char **environ;
 
-void doit(int fd);
+void* doit(void* arg);
 void client_error(int fd, char *cause, char *err_num, char *short_msg, char *long_msg);
 int parse_uri(char *uri, char *filename, char *cgiargs);
 void serve_static(int fd, char *filename, size_t filesize);
@@ -12,6 +13,8 @@ void get_filetype(char *filename, char *filetype);
 
 int main(int argc, char *argv[])
 {
+    threadpool_t *pool = threadpool_init(20, 40); // 20个线程，40工作
+
     int listenfd, clientfd;
 
     char ch;
@@ -38,95 +41,98 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    // start listen
-    signal(SIGCHLD, SIG_IGN);
-    pid_t pid;
+    /* 设置信号 */
+    signal(SIGPIPE, SIG_IGN);
+
     listenfd = tcp_server(NULL, atoi(port));
     while (1)
     {
         if ((clientfd = accept(listenfd, NULL, NULL)) < 0)
         {
-            bug("listenfd %d clientfd %d\n", listenfd, clientfd);
             err_sys("accept");
         }
-
-        pid = fork();
-        if (pid < 0)
-            err_sys("fork");
-
-        if (pid == 0) // in child proces
-        {
-            close(listenfd);
-            doit(clientfd);
-            exit(EXIT_SUCCESS);
-        }
-        else if (pid > 0) // in parent process
-        {
-            close(clientfd);
-        }
+        
+        /* 用线程池来处理连接 */
+        int *tmp_fd = malloc(sizeof(int));
+        *tmp_fd = clientfd;
+        threadpool_add_job(pool, doit, (void *)tmp_fd);
     }
 
+    // threadpool_destory(pool);
+    // 这里应该接收ctrl c 信号，然后调用threadpool_destory函数
     exit(EXIT_SUCCESS);
 }
 
 // 处理HTTP事务
-void doit(int fd)
+void* doit(void *arg)
 {
+    int fd = *((int *)arg);
     int is_static;
     struct stat sbuf;
-    char buf[LINE_MAX], method[LINE_MAX], uri[LINE_MAX], version[LINE_MAX];
-    char filename[LINE_MAX], cgiargs[LINE_MAX];
+    char buf[LINE_MAX] = {0}, method[LINE_MAX] = {0}, uri[LINE_MAX] = {0}, version[LINE_MAX] = {0};
+    char filename[LINE_MAX] = {0}, cgiargs[LINE_MAX] = {0};
 
-    // 读入请求行
-    readline(fd, buf, sizeof(buf));
-    sscanf(buf, "%s %s %s", method, uri, version);
-
-    // 读入请求报头,简单打印到标准输出
-    while (readline(fd, buf, sizeof(buf)))
+    do
     {
-        printf("%s", buf);
-        if (strcmp(buf, "\r\n") == 0)
-            break;
-    }
-
-    if (strcmp(method, "GET"))
-    {
-        client_error(fd, method, "501", "Impelementd", "minihttp does not impelement this method");
-        return;
-    }
-
-    is_static = parse_uri(uri, filename, cgiargs);
-    if (stat(filename, &sbuf) < 0)
-    {
-        client_error(fd, filename, "404", "Not found", "miniftp couldn't find this file");
-        return;
-    }
-
-    if (is_static) /* Serve static content */
-    {
-        if (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode))
+        // 读入请求行
+        if (readline(fd, buf, sizeof(buf)) > 0)
         {
-            client_error(fd, filename, "403", "Forbidden", "minihttp couldn't read the file");
-            return;
+            if (sscanf(buf, "%s %s %s", method, uri, version) != 3)
+            {
+                client_error(fd, "GET", "501", "Not Impelemented", "error request line");
+                break;
+            }
         }
-        serve_static(fd, filename, sbuf.st_size);
-    }
-    else /* Serve dynamic content */
-    {
-        if (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode))
-        {
-            client_error(fd, filename, "403", "Forbidden", "minihttp couldn't run the CGI program");
-            return;
-        } 
-        serve_dynamic(fd, filename, cgiargs);
-    }
 
+        // 读入请求报头,简单打印到标准输出
+        while (readline(fd, buf, sizeof(buf)) > 0)
+        {
+            if (strcmp(buf, "\r\n") == 0)
+                break;
+        }
+
+        /* 过滤所有非GET请求*/
+        if (strcmp(method, "GET"))
+        {
+            client_error(fd, method, "501", "Not Impelementd", "minihttp does not impelement this method");
+            break;
+        }
+
+        is_static = parse_uri(uri, filename, cgiargs);
+        if (stat(filename, &sbuf) < 0)
+        {
+            client_error(fd, filename, "404", "Not found", "miniftp couldn't find this file");
+            break;
+        }
+
+        if (is_static) /* Serve static content */
+        {
+            if (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode))
+            {
+                client_error(fd, filename, "403", "Forbidden", "minihttp couldn't read the file");
+                break;
+            }
+            serve_static(fd, filename, sbuf.st_size);
+        }
+        else /* Serve dynamic content */
+        {
+            if (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode))
+            {
+                client_error(fd, filename, "403", "Forbidden", "minihttp couldn't run the CGI program");
+                break;
+            } 
+            serve_dynamic(fd, filename, cgiargs);
+        }
+    } while (0);
+
+    close(fd);
+    free((int *)arg);
+    return NULL;
 }
 
 void client_error(int fd, char *cause, char *err_num, char *short_msg, char *long_msg)
 {
-    bug("%s %s\n", err_num, short_msg);
-    char buf[LINE_MAX], body[MAX_BUF];
+    char buf[MAX_BUF], body[MAX_BUF];
 
     // Build the HTTP response
     sprintf(body, "<html><title>minihttp error</title>");
@@ -137,12 +143,17 @@ void client_error(int fd, char *cause, char *err_num, char *short_msg, char *lon
 
     // Print the HTTP response
     sprintf(buf, "HTTP/1.0 %s %s\r\n", err_num, short_msg);
-    writen(fd, buf, strlen(buf));
-    sprintf(buf, "Content-type: text/html\r\n");
-    writen(fd, buf, strlen(buf));
-    sprintf(buf, "Content-length: %d\r\n\r\n", (int)strlen(body));
-    writen(fd, buf, strlen(buf));
-    writen(fd, body, strlen(body));
+    sprintf(buf, "%sContent-type: text/html\r\n", buf);
+    sprintf(buf, "%sContent-length: %d\r\n\r\n", buf, (int)strlen(body));
+
+    if (writen(fd, buf, strlen(buf)) < 0)
+    {
+        return;
+    }
+    if (writen(fd, body, strlen(body)) < 0)
+    {
+        return;
+    }
 }
 
 int parse_uri(char *uri, char *filename, char *cgiargs)
