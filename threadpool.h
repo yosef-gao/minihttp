@@ -16,8 +16,8 @@ typedef struct threadpool
 {
     int thread_num;                         // 线程池中开启线程的个数
     int queue_max_num;                      // 队列中最大job的个数
-    job_t *head;                     // 指向job的头指针
-    job_t *tail;                     // 指向job的尾指针
+    job_t *head;                            // 指向job的头指针
+    job_t *tail;                            // 指向job的尾指针
     pthread_t *pthreads;                    // 线程池中所有线程的pthread_t
     pthread_mutex_t mutex;                  // 互斥信号量
     pthread_cond_t queue_empty;             // 队列为空的条件变量

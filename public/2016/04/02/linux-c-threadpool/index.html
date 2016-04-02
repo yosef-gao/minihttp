@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>简单Linux C线程池的实现 | Fantacity</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="大多处网络服务器，包括Web服务器都有一个特点，就是单位时间内要处理大量的请求，且处理的时间往往比较短。本文会分析一下多进程网络服务器模型、多线程网络服务器模型（包括线程池）之间的优缺点，并给出一个简单的线程池模型。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="简单Linux C线程池的实现">
+<meta property="og:url" content="http://yosef-gao.github.io/2016/04/02/linux-c-threadpool/index.html">
+<meta property="og:site_name" content="Fantacity">
+<meta property="og:description" content="大多处网络服务器，包括Web服务器都有一个特点，就是单位时间内要处理大量的请求，且处理的时间往往比较短。本文会分析一下多进程网络服务器模型、多线程网络服务器模型（包括线程池）之间的优缺点，并给出一个简单的线程池模型。">
+<meta property="og:updated_time" content="2016-04-02T05:31:35.773Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="简单Linux C线程池的实现">
+<meta name="twitter:description" content="大多处网络服务器，包括Web服务器都有一个特点，就是单位时间内要处理大量的请求，且处理的时间往往比较短。本文会分析一下多进程网络服务器模型、多线程网络服务器模型（包括线程池）之间的优缺点，并给出一个简单的线程池模型。">
+  
+    <link rel="alternate" href="/atom.xml" title="Fantacity" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" integrity="sha384-XdYbMnZ/QjLh6iI4ogqCTaIjrFk87ip+ekIjefZch0Y+PvJ8CDYtEs1ipDmPorQ+" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="/css/styles.css">
+  
+
+</head>
+
+<body>
+  <nav class="navbar navbar-inverse">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="main-menu-navbar">
+      <ul class="nav navbar-nav">
+        
+          <li><a class=""
+                 href="/index.html">Home</a></li>
+        
+          <li><a class=""
+                 href="/archives/">Archives</a></li>
+        
+          <li><a class=""
+                 href="https://github.com/yosef-gao">Github</a></li>
+        
+          <li><a class=""
+                 href="/about/aboutme.html">About Me</a></li>
+        
+      </ul>
+
+      <!--
+      <ul class="nav navbar-nav navbar-right">
+        
+          <li><a href="/atom.xml" title="RSS Feed"><i class="fa fa-rss"></i></a></li>
+        
+      </ul>
+      -->
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+  <div class="container">
+    <div class="blog-header">
+  <h1 class="blog-title">Fantacity</h1>
+  
+    <p class="lead blog-description">Stand Alone Complex</p>
+  
+</div>
+
+    <div class="row">
+        <div class="col-sm-8 blog-main">
+          <article id="post-linux-c-threadpool" class="article article-type-post" itemscope itemprop="blogPost">
+
+  <header class="article-header">
+    
+  
+    <h1 class="article-title" itemprop="name">
+      简单Linux C线程池的实现
+    </h1>
+  
+
+
+  </header>
+
+  <div class="article-meta">
+    <div class="article-datetime">
+  <a href="/2016/04/02/linux-c-threadpool/" class="article-date"><time datetime="2016-04-02T04:46:54.000Z" itemprop="datePublished">2016-04-02</time></a>
+</div>
+
+    <div class="article-author">yosef gao</div>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Program/">Program</a>
+  </div>
+
+
+  </div>
+  <div class="article-inner">
+
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>大多处网络服务器，包括Web服务器都有一个特点，就是单位时间内要处理大量的请求，且处理的时间往往比较短。本文会分析一下多进程网络服务器模型、多线程网络服务器模型（包括线程池）之间的优缺点，并给出一个简单的线程池模型。</p>
+<a id="more"></a>
+<h2 id="多进程网络服务器模型"><a href="#多进程网络服务器模型" class="headerlink" title="多进程网络服务器模型"></a>多进程网络服务器模型</h2><p>多进程网络服务器模型，其基本框架往往是，父进程用<code>socket</code>创建一个监听套接字，然后<code>bind</code>IP以及port，接着开始<code>listen</code>该套接字，通过一个while循环来<code>accept</code>连接，对于每一个连接，<code>fork</code>一个子进程来处理连接，并继续<code>accept</code>。简化后的代码如下：</p>
+<figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> listenfd, clientfd;</span><br><span class="line"><span class="keyword">struct</span> sockadd_in servaddr;</span><br><span class="line">listenfd = socket(AF_INET, SOCK_STREAM, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// ...初始化servaddr,填入addr,port等...</span></span><br><span class="line"></span><br><span class="line">bind(listenfd, (<span class="keyword">struct</span> sockadd \*)&amp;servaddr, <span class="keyword">sizeof</span>(servaddr));</span><br><span class="line"></span><br><span class="line">listen(listenfd, LISTENQ);</span><br><span class="line"></span><br><span class="line"><span class="keyword">pid_t</span> pid;</span><br><span class="line"><span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">&#123;</span><br><span class="line">    clientfd = accept(listenfd, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">    pid = fork();</span><br><span class="line">    <span class="keyword">if</span> (pid == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// ...出错处理...</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (pid == <span class="number">0</span>) <span class="comment">// in child</span></span><br><span class="line">    &#123;</span><br><span class="line">        close(listenfd);</span><br><span class="line">        <span class="comment">// handle(clientfd);</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (pid &gt; <span class="number">0</span>) <span class="comment">// in parent</span></span><br><span class="line">    &#123;</span><br><span class="line">        close(clientfd);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这种模型的缺点也十分明显，我们都知道<code>fork</code>一个子进程的代价是很高的，表现在以下几点：</p>
+<ol>
+<li><p>每次进来一个连接，操作系统为其创建一个进程，开销太大。《APUE》书8.3节讲到子进程是父进程的副本，父进程和子进程共享正文段，子进程获得父进数据空间、堆和栈的副本。即便现在现在很多实现通过写时复制(Copy-On-Write,COW)技术来替代完全拷贝，但是其中有一个复制父进程页表的操作，这也是为什么在Linux下创建进程比创建线程开销大的原因，而所有线程都共享一个页表[1]。</p>
+</li>
+<li><p>进程调度压力大。当并发量上来之后，系统会有N多个进程，这时候操作系统将花费相当多的时间来调度进程以及执行进程的上下文切换。</p>
+</li>
+<li><p>每个进程都有自己独立的地址空间，需要消耗一定的内存，太多的进程会造成内存的大量消耗。同时，高并发下父子进程之间的IPC也是一个问题。</p>
+</li>
+</ol>
+<hr>
+<h2 id="多线程网络服务器模型"><a href="#多线程网络服务器模型" class="headerlink" title="多线程网络服务器模型"></a>多线程网络服务器模型</h2><p>多线程网络服务器模型大致同上，不同点在于把每次<code>accept</code>一个新连接是创建一个线程而不是进程来处理。然而我们知道web服务器的一个特点就是短而高频率的请求，表现在服务器端就是不停地创建线程，销毁线程。所以该方法虽然在一定程度上解决了<code>fork</code>的开销问题，但是同样没有办法避免线程调度开销问题以及内存问题。</p>
+<p>一个改进的方法是改用线程池，让线程的数量固定下来，这样就解决了上述问题。其基本架构为用一个<code>loop</code>来<code>accept</code>连接，之后把这个连接分配给线程池中的一个线程来处理，处理完了之后这个线程回归线程池等待下一次处理连接。从目前来看，该方法已经很好地解决了上面提到的各种问题，文末也会给出该方法的不足以及改进。下面给出一个较为简单的线程池模型。这份threadpool的实现并非我原创的，看到代码条理清楚，清晰易懂，就转载过来了[2]。</p>
+<figure class="highlight cpp"><figcaption><span>threadpool.h</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> _THREAD_POOL_H_</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _THREAD_POOL_H_</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">void</span> *(*callback_func)(<span class="keyword">void</span>*);</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> job</span><br><span class="line">&#123;</span><br><span class="line">    callback_func p_callback_func;          <span class="comment">// 线程回调函数</span></span><br><span class="line">    <span class="keyword">void</span> *arg;</span><br><span class="line">    <span class="keyword">struct</span> job *next;</span><br><span class="line">&#125; <span class="keyword">job_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> threadpool</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">int</span> thread_num;                         <span class="comment">// 线程池中开启线程的个数</span></span><br><span class="line">    <span class="keyword">int</span> queue_max_num;                      <span class="comment">// 队列中最大job的个数</span></span><br><span class="line">    <span class="keyword">job_t</span> *head;                            <span class="comment">// 指向job的头指针</span></span><br><span class="line">    <span class="keyword">job_t</span> *tail;                            <span class="comment">// 指向job的尾指针</span></span><br><span class="line">    <span class="keyword">pthread_t</span> *pthreads;                    <span class="comment">// 线程池中所有线程的pthread_t</span></span><br><span class="line">    <span class="keyword">pthread_mutex_t</span> mutex;                  <span class="comment">// 互斥信号量</span></span><br><span class="line">    <span class="keyword">pthread_cond_t</span> queue_empty;             <span class="comment">// 队列为空的条件变量</span></span><br><span class="line">    <span class="keyword">pthread_cond_t</span> queue_not_empty;         <span class="comment">// 队列不为空的条件变量</span></span><br><span class="line">    <span class="keyword">pthread_cond_t</span> queue_not_full;          <span class="comment">// 队列不为滿的条件变量</span></span><br><span class="line">    <span class="keyword">int</span> queue_cur_num;                      <span class="comment">// 队列当前的job个数</span></span><br><span class="line">    <span class="keyword">int</span> queue_close;                        <span class="comment">// 队列是否已经关闭</span></span><br><span class="line">    <span class="keyword">int</span> pool_close;                         <span class="comment">// 线程池是否已经关闭</span></span><br><span class="line">&#125; <span class="keyword">threadpool_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span><br><span class="line"> * pthreadpool_init - 初始化线程池</span><br><span class="line"> * @thread_num - 线程池开启的线程个数</span><br><span class="line"> * @queue_max_num - 队列的最大job个数</span><br><span class="line"> * 返回 - 成功返回线程池地址 失败返回NULL</span><br><span class="line"> * */</span></span><br><span class="line"><span class="keyword">threadpool_t</span> *threadpool_init(<span class="keyword">int</span> thread_num, <span class="keyword">int</span> queue_max_num);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span><br><span class="line"> * threadpool_add_job - 想线程池中添加任务</span><br><span class="line"> * @pool - 线程池地址</span><br><span class="line"> * @callback_function - 回调函数</span><br><span class="line"> * @arg - 回调函数参数</span><br><span class="line"> * 返回 - 成功返回0 失败返回-1</span><br><span class="line"> * */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">threadpool_add_job</span><span class="params">(threadpool_t *pool, callback_func p_callback_fun, <span class="keyword">void</span> *arg)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span><br><span class="line"> * threadpool_destory - 销毁线程池</span><br><span class="line"> * @pool - 线程池地址</span><br><span class="line"> * 返回 - 永远返回0</span><br><span class="line"> * */</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">threadpool_destory</span><span class="params">(threadpool_t *pool)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span><br><span class="line"> * threadpool_function - 线程池中线程函数</span><br><span class="line"> * @arg - 线程池地址</span><br><span class="line"> * */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">threadpool_function</span><span class="params">(<span class="keyword">void</span> *arg)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span> <span class="comment">/* _THREAD_POOL_H_ */</span></span></span><br></pre></td></tr></table></figure>
+<figure class="highlight cpp"><figcaption><span>threadpool.c</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="string">"threadpool.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="string">"common.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">threadpool_t</span> *threadpool_init(<span class="keyword">int</span> thread_num, <span class="keyword">int</span> queue_max_num)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">threadpool_t</span> *pool = <span class="literal">NULL</span>;</span><br><span class="line">    pool = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">threadpool_t</span>));</span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="literal">NULL</span> == pool)</span><br><span class="line">        &#123;</span><br><span class="line">            bug(<span class="string">"failed to malloc threadpool\n"</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        pool-&gt;thread_num = thread_num;</span><br><span class="line">        pool-&gt;queue_max_num = queue_max_num;</span><br><span class="line">        pool-&gt;queue_cur_num = <span class="number">0</span>;</span><br><span class="line">        pool-&gt;head = <span class="literal">NULL</span>;</span><br><span class="line">        pool-&gt;tail = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (pthread_mutex_init(&amp;(pool-&gt;mutex), <span class="literal">NULL</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            bug(<span class="string">"pthread_mutex_init\n"</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (pthread_cond_init(&amp;(pool-&gt;queue_empty), <span class="literal">NULL</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            bug(<span class="string">"pthread_cond_init\n"</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (pthread_cond_init(&amp;(pool-&gt;queue_not_empty), <span class="literal">NULL</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            bug(<span class="string">"pthread_cond_init\n"</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (pthread_cond_init(&amp;(pool-&gt;queue_not_full), <span class="literal">NULL</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            bug(<span class="string">"pthread_cond_init\n"</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        pool-&gt;pthreads = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">pthread_t</span>) * thread_num); </span><br><span class="line">        <span class="keyword">if</span> (<span class="literal">NULL</span> == pool-&gt;pthreads)</span><br><span class="line">        &#123;</span><br><span class="line">            bug(<span class="string">"malloc error\n"</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        pool-&gt;queue_close = <span class="number">0</span>;</span><br><span class="line">        pool-&gt;pool_close = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> i;</span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; pool-&gt;thread_num; ++i)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (pthread_create(&amp;(pool-&gt;pthreads[i]), <span class="literal">NULL</span>, threadpool_function, (<span class="keyword">void</span> *)pool) &lt; <span class="number">0</span>)</span><br><span class="line">                bug(<span class="string">"pthread_create\n"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> pool;</span><br><span class="line">    &#125; <span class="keyword">while</span> (<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">threadpool_add_job</span><span class="params">(threadpool_t *pool, callback_func p_callback_func, <span class="keyword">void</span> *arg)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (pool == <span class="literal">NULL</span> || p_callback_func == <span class="literal">NULL</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    pthread_mutex_lock(&amp;(pool-&gt;mutex));</span><br><span class="line">    <span class="keyword">while</span> ((pool-&gt;queue_cur_num == pool-&gt;queue_max_num) &amp;&amp; !(pool-&gt;pool_close || pool-&gt;queue_close))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 等待threadpool_function发送queue_not_full信号</span></span><br><span class="line">        pthread_cond_wait(&amp;(pool-&gt;queue_not_full), &amp;(pool-&gt;mutex)); <span class="comment">// 队列满的时候就等待</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (pool-&gt;queue_close || pool-&gt;pool_close) <span class="comment">// 队列关闭或者线程池关闭就退出</span></span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_unlock(&amp;(pool-&gt;mutex));</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">job_t</span> *pjob = (<span class="keyword">job_t</span> *)<span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">job_t</span>));</span><br><span class="line">    <span class="keyword">if</span> (<span class="literal">NULL</span> == pjob)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_unlock(&amp;(pool-&gt;mutex));</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    pjob-&gt;p_callback_func = p_callback_func;</span><br><span class="line">    pjob-&gt;arg = arg;</span><br><span class="line">    pjob-&gt;next = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (pool-&gt;head == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        pool-&gt;head = pool-&gt;tail = pjob;</span><br><span class="line">        pthread_cond_broadcast(&amp;(pool-&gt;queue_not_empty)); <span class="comment">// 队列空的时候，有任务来了，就通知线程池中的线程：队列非空</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        pool-&gt;tail-&gt;next = pjob;</span><br><span class="line">        pool-&gt;tail = pjob; <span class="comment">// 把任务插入到队列的尾部</span></span><br><span class="line">    &#125;</span><br><span class="line">    pool-&gt;queue_cur_num++;</span><br><span class="line">    pthread_mutex_unlock(&amp;(pool-&gt;mutex));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> *<span class="title">threadpool_function</span><span class="params">(<span class="keyword">void</span> *arg)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">threadpool_t</span> *pool = (<span class="keyword">threadpool_t</span> *)arg;</span><br><span class="line">    <span class="keyword">job_t</span> *pjob = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_lock(&amp;(pool-&gt;mutex));</span><br><span class="line">        <span class="keyword">while</span> ((pool-&gt;queue_cur_num == <span class="number">0</span>) &amp;&amp; !pool-&gt;pool_close) <span class="comment">// 队列为空，就等待队列非空</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 等待threadpool_add_job函数发送queue_not_empty信号</span></span><br><span class="line">            pthread_cond_wait(&amp;(pool-&gt;queue_not_empty), &amp;(pool-&gt;mutex));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (pool-&gt;pool_close) <span class="comment">// 线程池关闭，线程就退出</span></span><br><span class="line">        &#123;</span><br><span class="line">            pthread_mutex_unlock(&amp;(pool-&gt;mutex));</span><br><span class="line">            pthread_exit(<span class="literal">NULL</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        pool-&gt;queue_cur_num--;</span><br><span class="line">        pjob = pool-&gt;head;</span><br><span class="line">        <span class="keyword">if</span> (pool-&gt;queue_cur_num == <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            pool-&gt;head = pool-&gt;tail = <span class="literal">NULL</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            pool-&gt;head = pjob-&gt;next;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (pool-&gt;queue_cur_num == <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            pthread_cond_signal(&amp;(pool-&gt;queue_empty)); <span class="comment">// 通知destory函数可以销毁线程池了</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (pool-&gt;queue_cur_num &lt;= pool-&gt;queue_max_num - <span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 向threadpool_add_job发送queue_not_full信号</span></span><br><span class="line">            pthread_cond_broadcast(&amp;(pool-&gt;queue_not_full));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        pthread_mutex_unlock(&amp;(pool-&gt;mutex));</span><br><span class="line"></span><br><span class="line">        (*(pjob-&gt;p_callback_func))(pjob-&gt;arg); <span class="comment">// 线程真正要做的工作，调用回调函数</span></span><br><span class="line">        <span class="built_in">free</span>(pjob);</span><br><span class="line">        pjob = <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">threadpool_destory</span><span class="params">(threadpool_t *pool)</span></span><br><span class="line"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (pool == <span class="literal">NULL</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    pthread_mutex_lock(&amp;(pool-&gt;mutex));</span><br><span class="line">    <span class="keyword">if</span> (pool-&gt;queue_close &amp;&amp; pool-&gt;pool_close) <span class="comment">// 线程池已经退出了，就直接返回</span></span><br><span class="line">    &#123;</span><br><span class="line">        pthread_mutex_unlock(&amp;(pool-&gt;mutex));</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    pool-&gt;queue_close = <span class="number">1</span>; <span class="comment">// 关闭任务队列，不接受新的任务了</span></span><br><span class="line">    <span class="keyword">while</span> (pool-&gt;queue_cur_num != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_cond_wait(&amp;(pool-&gt;queue_empty), &amp;(pool-&gt;mutex)); <span class="comment">// 等待队列为空</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    pool-&gt;pool_close = <span class="number">1</span>; <span class="comment">// 线程池关闭</span></span><br><span class="line">    pthread_mutex_unlock(&amp;(pool-&gt;mutex));</span><br><span class="line">    pthread_cond_broadcast(&amp;(pool-&gt;queue_not_empty)); <span class="comment">// 唤醒线程池中正在阻塞的线程</span></span><br><span class="line">    pthread_cond_broadcast(&amp;(pool-&gt;queue_not_full)); <span class="comment">// 唤醒添加任务的threadpool_add_job函数</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> i;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; pool-&gt;thread_num; ++i)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_join(pool-&gt;pthreads[i], <span class="literal">NULL</span>); <span class="comment">// 等待线程池的所有线程执行完毕</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    pthread_mutex_destroy(&amp;(pool-&gt;mutex)); <span class="comment">// 清理资源</span></span><br><span class="line">    pthread_cond_destroy(&amp;(pool-&gt;queue_empty)); </span><br><span class="line">    pthread_cond_destroy(&amp;(pool-&gt;queue_not_empty)); </span><br><span class="line">    pthread_cond_destroy(&amp;(pool-&gt;queue_not_full)); </span><br><span class="line">    <span class="built_in">free</span>(pool-&gt;pthreads);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">job_t</span> *pjob;</span><br><span class="line">    <span class="keyword">while</span> (pool-&gt;head != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        pjob = pool-&gt;head;</span><br><span class="line">        pool-&gt;head = pjob-&gt;next;</span><br><span class="line">        <span class="built_in">free</span>(pjob);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">free</span>(pool);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="剩余问题"><a href="#剩余问题" class="headerlink" title="剩余问题"></a>剩余问题</h2><p>线程池的方案虽然看起来很不错，但在实际情况中，很多连接都是长连接（在一个TCP连接上进行多次通信），一个线程在受到任务以后，处理完第一批来的数据，此时会再次调用<code>read</code>，但是客户端下一次发送数据过来的时机是不确定的，于是这个线程就被这个read给阻塞住了（socket<br>fd默认是blocking的）,直到1.这个fd可读者；2.对方已经关闭连接；3.TCP超时这3个情况之一发生之前什么都不能干，那么并发量上来之后还是会发生部分连接无法被即使处理的情况。</p>
+<p>一个比较好的解决方案是把fd 设置为non-blocking,并通过事件驱动（Event-driven）的方法来处理连接，在linux下可以通过epoll实现。关于epoll目前还在学习当中。一个较为完整的实现可以参考引用2中给出的链接。</p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p>[1] <a href="http://lifeofzjs.com/blog/2015/05/16/how-to-write-a-server/" target="_blank" rel="external">http://lifeofzjs.com/blog/2015/05/16/how-to-write-a-server/</a><br>[2] <a href="http://www.cnblogs.com/venow/archive/2012/11/22/2779667.html" target="_blank" rel="external">http://www.cnblogs.com/venow/archive/2012/11/22/2779667.html</a></p>
+
+      
+    </div>
+
+    
+      
+
+    
+
+    <footer class="article-footer">
+      <a data-url="http://yosef-gao.github.io/2016/04/02/linux-c-threadpool/" data-id="cimiqgyn7000jmjpgwrt1olgo" class="article-share-link">
+        <i class="fa fa-share"></i> Share
+      </a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/">linux</a></li></ul>
+
+
+    </footer>
+  </div>
+  
+    
+<ul id="article-nav" class="nav nav-pills nav-justified">
+  
+  <li role="presentation">
+    <a href="/2016/03/31/unix-time-function/" id="article-nav-older" class="article-nav-link-wrap">
+      <i class="fa fa-chevron-left pull-left"></i>
+      <span class="article-nav-link-title">UNIX下各时间函数之间的关系</span>
+    </a>
+  </li>
+  
+  
+</ul>
+
+
+  
+</article>
+
+
+
+
+        </div>
+        <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+          
+  <div class="sidebar-module sidebar-module-inset">
+  <h4>About</h4>
+  <p>Hi, I am yosef gao.</p>
+<p>Graduate student of Zhejiang University of technology.</p>
+<p>Major in Image and Graphics. Mainly use c/c++, familiar with c#.</p>
+<p>I’m now learing server development.</p>
+<p><i class="fa fa-user fa-fw"></i> <em>yosef gao</em><br><i class="fa fa-graduation-cap fa-fw"></i> <em>ZJUT</em><br><i class="fa fa-wechat fa-fw"></i> <em>perfect_means_shit</em><br><i class="fa fa-envelope fa-fw"></i> <a href="&#109;&#97;&#x69;&#108;&#x74;&#x6f;&#x3a;&#49;&#x30;&#51;&#x33;&#49;&#x33;&#49;&#54;&#x36;&#x30;&#x40;&#x71;&#113;&#46;&#x63;&#x6f;&#x6d;">&#49;&#x30;&#51;&#x33;&#49;&#x33;&#49;&#54;&#x36;&#x30;&#x40;&#x71;&#113;&#46;&#x63;&#x6f;&#x6d;</a></p>
+
+</div>
+
+
+  
+  <div class="sidebar-module">
+    <h4>Categories</h4>
+    <ul class="sidebar-module-list"><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/categories/ComputerScience/">ComputerScience</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/categories/Others/">Others</a><span class="sidebar-module-list-count">3</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/categories/Program/">Program</a><span class="sidebar-module-list-count">4</span></li></ul>
+  </div>
+
+
+
+  
+  <div class="sidebar-module">
+    <h4>Tags</h4>
+    <ul class="sidebar-module-list"><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/C/">C++</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/OS/">OS</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/bottle/">bottle</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/hexo/">hexo</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/linux/">linux</a><span class="sidebar-module-list-count">2</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/markdown/">markdown</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/mysql/">mysql</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/python/">python</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/sae/">sae</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/unix/">unix</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/zjut/">zjut</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/内存管理/">内存管理</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/指针数组/">指针数组</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/数组指针/">数组指针</a><span class="sidebar-module-list-count">1</span></li></ul>
+  </div>
+
+
+
+  
+  <div class="sidebar-module">
+    <h4>Tag Cloud</h4>
+    <p class="tagcloud">
+      <a href="/tags/C/" style="font-size: 10px;">C++</a> <a href="/tags/OS/" style="font-size: 10px;">OS</a> <a href="/tags/bottle/" style="font-size: 10px;">bottle</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/sae/" style="font-size: 10px;">sae</a> <a href="/tags/unix/" style="font-size: 10px;">unix</a> <a href="/tags/zjut/" style="font-size: 10px;">zjut</a> <a href="/tags/内存管理/" style="font-size: 10px;">内存管理</a> <a href="/tags/指针数组/" style="font-size: 10px;">指针数组</a> <a href="/tags/数组指针/" style="font-size: 10px;">数组指针</a>
+    </p>
+  </div>
+
+
+  
+  <div class="sidebar-module">
+    <h4>Archives</h4>
+    <ul class="sidebar-module-list"><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/archives/2016/04/">April 2016</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/archives/2016/03/">March 2016</a><span class="sidebar-module-list-count">7</span></li></ul>
+  </div>
+
+
+
+  
+  <div class="sidebar-module">
+    <h4>Recents</h4>
+    <ul class="sidebar-module-list">
+      
+        <li>
+          <a href="/2016/04/02/linux-c-threadpool/">简单Linux C线程池的实现</a>
+        </li>
+      
+        <li>
+          <a href="/2016/03/31/unix-time-function/">UNIX下各时间函数之间的关系</a>
+        </li>
+      
+        <li>
+          <a href="/2016/03/26/os-address-translate/">操作系统 地址转换</a>
+        </li>
+      
+        <li>
+          <a href="/2016/03/23/cpp-array-and-pointer/">C++ 中指针数组与数组指针</a>
+        </li>
+      
+        <li>
+          <a href="/2016/03/13/markdown/">Markdown 语法的简要规则</a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+
+        </div>
+    </div>
+  </div>
+  <footer class="blog-footer">
+  <div class="container">
+    <div id="footer-info" class="inner">
+      &copy; 2016 Yosef Gao<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+  
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+</body>
+</html>

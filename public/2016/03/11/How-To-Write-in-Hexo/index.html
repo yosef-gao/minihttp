@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Hexo | Fantacity</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Starting the serverTo view your newly created site in a browser, start the local server:$ hexo server --draft --openINFO  Hexo is running at http://0.0.0.0:4000/. Press Ctrl+C to stop.
+This starts the">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://yosef-gao.github.io/2016/03/11/How-To-Write-in-Hexo/index.html">
+<meta property="og:site_name" content="Fantacity">
+<meta property="og:description" content="Starting the serverTo view your newly created site in a browser, start the local server:$ hexo server --draft --openINFO  Hexo is running at http://0.0.0.0:4000/. Press Ctrl+C to stop.
+This starts the">
+<meta property="og:updated_time" content="2016-04-02T05:27:46.941Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Hexo">
+<meta name="twitter:description" content="Starting the serverTo view your newly created site in a browser, start the local server:$ hexo server --draft --openINFO  Hexo is running at http://0.0.0.0:4000/. Press Ctrl+C to stop.
+This starts the">
+  
+    <link rel="alternate" href="/atom.xml" title="Fantacity" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" integrity="sha384-XdYbMnZ/QjLh6iI4ogqCTaIjrFk87ip+ekIjefZch0Y+PvJ8CDYtEs1ipDmPorQ+" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="/css/styles.css">
+  
+
+</head>
+
+<body>
+  <nav class="navbar navbar-inverse">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="main-menu-navbar">
+      <ul class="nav navbar-nav">
+        
+          <li><a class=""
+                 href="/index.html">Home</a></li>
+        
+          <li><a class=""
+                 href="/archives/">Archives</a></li>
+        
+          <li><a class=""
+                 href="https://github.com/yosef-gao">Github</a></li>
+        
+          <li><a class=""
+                 href="/about/aboutme.html">About Me</a></li>
+        
+      </ul>
+
+      <!--
+      <ul class="nav navbar-nav navbar-right">
+        
+          <li><a href="/atom.xml" title="RSS Feed"><i class="fa fa-rss"></i></a></li>
+        
+      </ul>
+      -->
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+  <div class="container">
+    <div class="blog-header">
+  <h1 class="blog-title">Fantacity</h1>
+  
+    <p class="lead blog-description">Stand Alone Complex</p>
+  
+</div>
+
+    <div class="row">
+        <div class="col-sm-8 blog-main">
+          <article id="post-How-To-Write-in-Hexo" class="article article-type-post" itemscope itemprop="blogPost">
+
+  <header class="article-header">
+    
+  
+    <h1 class="article-title" itemprop="name">
+      Hexo
+    </h1>
+  
+
+
+  </header>
+
+  <div class="article-meta">
+    <div class="article-datetime">
+  <a href="/2016/03/11/How-To-Write-in-Hexo/" class="article-date"><time datetime="2016-03-11T11:35:30.000Z" itemprop="datePublished">2016-03-11</time></a>
+</div>
+
+    <div class="article-author">yosef gao</div>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Others/">Others</a>
+  </div>
+
+
+  </div>
+  <div class="article-inner">
+
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Starting-the-server"><a href="#Starting-the-server" class="headerlink" title="Starting the server"></a>Starting the server</h2><p>To view your newly created site in a browser, start the local server:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ hexo server --draft --open</span><br><span class="line"></span><br><span class="line">INFO  Hexo is running at http://0.0.0.0:4000/. Press Ctrl+C to stop.</span><br></pre></td></tr></table></figure></p>
+<p>This starts the server with a few extra options:</p>
+<ul>
+<li>–draft : Enables viewable “draft” posts (by default, drafts are hidden)</li>
+<li>–open : Open the local site in your browser</li>
+</ul>
+<a id="more"></a>
+<h2 id="Creating-your-first-post"><a href="#Creating-your-first-post" class="headerlink" title="Creating your first post"></a>Creating your first post</h2><p>A good practice when starting new posts is to use the “draft” feature. Drafts will not be published by default, so you are free to make changes to other posts while keeping unfinished drafts hidden from public.</p>
+<p>Create a new draft post with the hexo new draft command:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ hexo new draft &quot;My First Blog Post&quot;</span><br><span class="line"># creates -&gt; ./source/_drafts/My-First-Blog-Post.md</span><br></pre></td></tr></table></figure></p>
+<p>To edit your draft, navigate to <font color="#c7254e">./source/_drafts/My-First-Blog-Post.md</font> and open the file with your favorite Markdown editor.</p>
+<p>Lets add a subheading and some paragraph content to your new post…<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">---</span><br><span class="line">title: My First Blog Post</span><br><span class="line">tags:</span><br><span class="line">---</span><br><span class="line">## Hello there</span><br><span class="line">This is some content.</span><br></pre></td></tr></table></figure></p>
+<div class="bs-callout bs-callout-info"><h4 id="Tip"><a href="#Tip" class="headerlink" title=" Tip"></a><i class="fa fa-info-circle"></i> Tip</h4><p>The stuff between the dashes — at the top of the markdown file is called “front-matter”. It is metadata that is used by Hexo and the active theme. See the <a href="https://hexo.io/docs/front-matter.html" target="_blank" rel="external">Hexo documentation on Front-Matter</a> for more information.</p>
+</div>
+<p>Saving changes to your Markdown files will be automatically detected by the running <font color="#c7254e">hexo server </font>and regenerated as static HTML files, <strong>but you must refresh the browser to view the changes.</strong></p>
+<h2 id="Publishing-drafts"><a href="#Publishing-drafts" class="headerlink" title="Publishing drafts"></a>Publishing drafts</h2><p>When it’s time to move the draft to a “live” post for the world to see, use the <font color="#c7254e">hexo publish </font>command:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ hexo publish My-First-Blog-Post</span><br></pre></td></tr></table></figure></p>
+<p>A few things will happen when this command is run:</p>
+<ol>
+<li>The markdown file <font color="#c7254e"> My-First-Blog-Post.md</font> moves from <font color="#c7254e">./source/_drafts/ to ./source/_posts.</font></li>
+<li>The file’s “front-matter” changes to include a publish date:<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">---</span><br><span class="line">title: My First Blog Post</span><br><span class="line">date: 2015-12-30 00:53:15  # &lt;-</span><br><span class="line">tags:</span><br><span class="line">---</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>Finally, prepare the entire site for deployment. Run the hexo generate command:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br><span class="line"># generates -&gt; ./public/</span><br></pre></td></tr></table></figure></p>
+<p>Everything that is required to run the website will be placed inside the <font color="#c7254e">./public</font>folder. You are all set to take this folder and transfer it to your public webserver or CDN.</p>
+<h2 id="The-correct-way-to-reference-the-image"><a href="#The-correct-way-to-reference-the-image" class="headerlink" title="The correct way to reference the image"></a>The correct way to reference the image</h2><p>The correct way to reference the image will thus be to use tag plugin syntax rather than markdown:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;% asset_path slug %&#125;</span><br><span class="line">&#123;% asset_img slug [title] %&#125;</span><br><span class="line">&#123;% asset_link slug [title] %&#125;</span><br><span class="line">eg.:</span><br><span class="line">&#123;% asset_img example.jpg This is an example image %&#125;</span><br><span class="line">&#123;% asset_img &quot;spaced asset.jpg&quot; &quot;spaced title&quot; %&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="Cheatsheet"><a href="#Cheatsheet" class="headerlink" title="Cheatsheet"></a>Cheatsheet</h2><p>Here is a reference of the components that produce Bootstrap markup with this theme…</p>
+<h3 id="Responsive-tables"><a href="#Responsive-tables" class="headerlink" title="Responsive tables"></a>Responsive tables</h3><p>Markdown:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">| Table Header 1 | iTable Header 2 | Table Header 3 |</span><br><span class="line">| - | - | - |</span><br><span class="line">| Division 1 | Division 2 | Division 3 |</span><br><span class="line">| Division 1 | Division 2 | Division 3 |</span><br><span class="line">| Division 1 | Division 2 | Division 3 |</span><br></pre></td></tr></table></figure></p>
+<p>…outputs:</p>
+<table>
+<thead>
+<tr>
+<th>Table Header 1</th>
+<th>Table Header 2</th>
+<th>Table Header 3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Division 1</td>
+<td>Division 2</td>
+<td>Division 3</td>
+</tr>
+<tr>
+<td>Division 1</td>
+<td>Division 2</td>
+<td>Division 3</td>
+</tr>
+<tr>
+<td>Division 1</td>
+<td>Division 2</td>
+<td>Division 3</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Bootstrap-Callouts"><a href="#Bootstrap-Callouts" class="headerlink" title="Bootstrap Callouts"></a>Bootstrap Callouts</h2><p>A custom tag for the <a href="http://cpratt.co/twitter-bootstrap-callout-css-styles/" target="_blank" rel="external">Bootstrap “callout” style</a> is available for use:</p>
+<p>In the Markdown:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;% callout info %&#125;</span><br><span class="line">#### &#123;% fa info-circle %&#125; Info</span><br><span class="line">This is some info content</span><br><span class="line">&#123;% endcallout %&#125;</span><br><span class="line"></span><br><span class="line">&#123;% callout warning %&#125;</span><br><span class="line">#### &#123;% fa exclamation-triangle %&#125; Warning</span><br><span class="line">This is some warning content</span><br><span class="line">&#123;% endcallout %&#125;</span><br><span class="line"></span><br><span class="line">&#123;% callout danger %&#125;</span><br><span class="line">#### &#123;% fa exclamation-triangle %&#125; Danger</span><br><span class="line">This is some danger content</span><br><span class="line">&#123;% endcallout %&#125;</span><br></pre></td></tr></table></figure></p>
+<p>…outputs:<br><div class="bs-callout bs-callout-info"><h4 id="Info"><a href="#Info" class="headerlink" title=" Info"></a><i class="fa fa-info-circle"></i> Info</h4><p>This is some info content</p>
+</div></p>
+<div class="bs-callout bs-callout-warning"><h4 id="Warning"><a href="#Warning" class="headerlink" title=" Warning"></a><i class="fa fa-exclamation-triangle"></i> Warning</h4><p>This is some warning content</p>
+</div>
+<div class="bs-callout bs-callout-danger"><h4 id="Danger"><a href="#Danger" class="headerlink" title=" Danger"></a><i class="fa fa-exclamation-triangle"></i> Danger</h4><p>This is some danger content</p>
+</div>
+<h2 id="Font-Awesome-icons"><a href="#Font-Awesome-icons" class="headerlink" title="Font-Awesome-icons"></a>Font-Awesome-icons</h2><p>The following code brings up a spinning icon:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;% fa refresh spin %&#125;</span><br></pre></td></tr></table></figure></p>
+<p>…outputs<br><i class="fa fa-refresh fa-spin"></i></p>
+<p>The following code brings up a fixed width icon:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;% fa home fw %&#125;</span><br></pre></td></tr></table></figure></p>
+<i class="fa fa-home fa-fw"></i>
+<p>Visit <a href="https://fortawesome.github.io/Font-Awesome/icons/" target="_blank" rel="external">Font Awesome Icons</a> to find icons you like.</p>
+<h2 id="Tag-Plugins-For-Relative-Path-Referencing"><a href="#Tag-Plugins-For-Relative-Path-Referencing" class="headerlink" title="Tag Plugins For Relative Path Referencing"></a>Tag Plugins For Relative Path Referencing</h2><p>Referencing images or other assets using normal markdown syntax and relative paths may cause them to display incorrectly on archive or index pages. Plugins have been created by the community to address this issue in Hexo 2. However, with the release of Hexo 3, several new tag plugins were added to core. These enable you to reference your assets more easily in posts:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;% asset_path slug %&#125;</span><br><span class="line">&#123;% asset_img slug [title] %&#125;</span><br><span class="line">&#123;% asset_link slug [title] %&#125;</span><br></pre></td></tr></table></figure>
+<p>For example, with post asset folders enabled, if you place an image example.jpg into your asset folder, it will not appear on the index page if you reference it using a relative path with regular <code>![](/example.jpg)</code> markdown syntax (however, it will work as expected in the post itself).</p>
+<p>The correct way to reference the image will thus be to use tag plugin syntax rather than markdown:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;% asset_img example.jpg This is an example image %&#125;</span><br><span class="line">&#123;% asset_img &quot;spaced asset.jpg&quot; &quot;spaced title&quot; %&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Markdown-editor"><a href="#Markdown-editor" class="headerlink" title="Markdown editor"></a>Markdown editor</h2><p><a href="https://stackedit.io" target="_blank" rel="external">stackedit is very nice</a></p>
+<h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p><a href="https://hexo.io/docs/" target="_blank" rel="external">Hexo Docs</a><br><a href="https://github.com/cgmartin/hexo-theme-bootstrap-blog" target="_blank" rel="external">hexo-theme-bootstrap-blog</a></p>
+
+      
+    </div>
+
+    
+      
+
+    
+
+    <footer class="article-footer">
+      <a data-url="http://yosef-gao.github.io/2016/03/11/How-To-Write-in-Hexo/" data-id="cimiqgylt0000mjpg56tara7u" class="article-share-link">
+        <i class="fa fa-share"></i> Share
+      </a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/">hexo</a></li></ul>
+
+
+    </footer>
+  </div>
+  
+    
+<ul id="article-nav" class="nav nav-pills nav-justified">
+  
+  <li role="presentation">
+    <a href="/2016/03/11/post-with-photo/" id="article-nav-older" class="article-nav-link-wrap">
+      <i class="fa fa-chevron-left pull-left"></i>
+      <span class="article-nav-link-title">po几张工大春天的美景</span>
+    </a>
+  </li>
+  
+  
+  <li role="presentation">
+    <a href="/2016/03/12/aqi-data-puller/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-link-title">用新浪SAE从aqicn.org抓取数据</span>
+      <i class="fa fa-chevron-right pull-right"></i>
+    </a>
+  </li>
+  
+</ul>
+
+
+  
+</article>
+
+
+
+
+        </div>
+        <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+          
+  <div class="sidebar-module sidebar-module-inset">
+  <h4>About</h4>
+  <p>Hi, I am yosef gao.</p>
+<p>Graduate student of Zhejiang University of technology.</p>
+<p>Major in Image and Graphics. Mainly use c/c++, familiar with c#.</p>
+<p>I’m now learing server development.</p>
+<p><i class="fa fa-user fa-fw"></i> <em>yosef gao</em><br><i class="fa fa-graduation-cap fa-fw"></i> <em>ZJUT</em><br><i class="fa fa-wechat fa-fw"></i> <em>perfect_means_shit</em><br><i class="fa fa-envelope fa-fw"></i> <a href="&#109;&#97;&#x69;&#108;&#x74;&#x6f;&#x3a;&#49;&#x30;&#51;&#x33;&#49;&#x33;&#49;&#54;&#x36;&#x30;&#x40;&#x71;&#113;&#46;&#x63;&#x6f;&#x6d;">&#49;&#x30;&#51;&#x33;&#49;&#x33;&#49;&#54;&#x36;&#x30;&#x40;&#x71;&#113;&#46;&#x63;&#x6f;&#x6d;</a></p>
+
+</div>
+
+
+  
+  <div class="sidebar-module">
+    <h4>Categories</h4>
+    <ul class="sidebar-module-list"><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/categories/ComputerScience/">ComputerScience</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/categories/Others/">Others</a><span class="sidebar-module-list-count">3</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/categories/Program/">Program</a><span class="sidebar-module-list-count">4</span></li></ul>
+  </div>
+
+
+
+  
+  <div class="sidebar-module">
+    <h4>Tags</h4>
+    <ul class="sidebar-module-list"><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/C/">C++</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/OS/">OS</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/bottle/">bottle</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/hexo/">hexo</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/linux/">linux</a><span class="sidebar-module-list-count">2</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/markdown/">markdown</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/mysql/">mysql</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/python/">python</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/sae/">sae</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/unix/">unix</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/zjut/">zjut</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/内存管理/">内存管理</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/指针数组/">指针数组</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/数组指针/">数组指针</a><span class="sidebar-module-list-count">1</span></li></ul>
+  </div>
+
+
+
+  
+  <div class="sidebar-module">
+    <h4>Tag Cloud</h4>
+    <p class="tagcloud">
+      <a href="/tags/C/" style="font-size: 10px;">C++</a> <a href="/tags/OS/" style="font-size: 10px;">OS</a> <a href="/tags/bottle/" style="font-size: 10px;">bottle</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/sae/" style="font-size: 10px;">sae</a> <a href="/tags/unix/" style="font-size: 10px;">unix</a> <a href="/tags/zjut/" style="font-size: 10px;">zjut</a> <a href="/tags/内存管理/" style="font-size: 10px;">内存管理</a> <a href="/tags/指针数组/" style="font-size: 10px;">指针数组</a> <a href="/tags/数组指针/" style="font-size: 10px;">数组指针</a>
+    </p>
+  </div>
+
+
+  
+  <div class="sidebar-module">
+    <h4>Archives</h4>
+    <ul class="sidebar-module-list"><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/archives/2016/04/">April 2016</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/archives/2016/03/">March 2016</a><span class="sidebar-module-list-count">7</span></li></ul>
+  </div>
+
+
+
+  
+  <div class="sidebar-module">
+    <h4>Recents</h4>
+    <ul class="sidebar-module-list">
+      
+        <li>
+          <a href="/2016/04/02/linux-c-threadpool/">简单Linux C线程池的实现</a>
+        </li>
+      
+        <li>
+          <a href="/2016/03/31/unix-time-function/">UNIX下各时间函数之间的关系</a>
+        </li>
+      
+        <li>
+          <a href="/2016/03/26/os-address-translate/">操作系统 地址转换</a>
+        </li>
+      
+        <li>
+          <a href="/2016/03/23/cpp-array-and-pointer/">C++ 中指针数组与数组指针</a>
+        </li>
+      
+        <li>
+          <a href="/2016/03/13/markdown/">Markdown 语法的简要规则</a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+
+        </div>
+    </div>
+  </div>
+  <footer class="blog-footer">
+  <div class="container">
+    <div id="footer-info" class="inner">
+      &copy; 2016 Yosef Gao<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+  
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+</body>
+</html>

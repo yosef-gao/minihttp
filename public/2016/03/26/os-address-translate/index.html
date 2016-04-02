@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>操作系统 地址转换 | Fantacity</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="之前本科的时候操作系统学得还不错，不过这么些年没用过之后发现忘得差不多了，要不是因为最近几次笔试，可能都还没意识到。比如有道题目是需要计算操作系统的地址转换的，硬是想不起来是怎么算的了。看来有必要重新学一下了。
+在计算机操作系统中，地址转换是存储管理的一个主要功能。所谓地址转换就是将用户的逻辑地址转换成内存的物理地址，完成地址重定位。需要指出的是，地址转换是操作系统的地址变换机构自行完成的，无需用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作系统 地址转换">
+<meta property="og:url" content="http://yosef-gao.github.io/2016/03/26/os-address-translate/index.html">
+<meta property="og:site_name" content="Fantacity">
+<meta property="og:description" content="之前本科的时候操作系统学得还不错，不过这么些年没用过之后发现忘得差不多了，要不是因为最近几次笔试，可能都还没意识到。比如有道题目是需要计算操作系统的地址转换的，硬是想不起来是怎么算的了。看来有必要重新学一下了。
+在计算机操作系统中，地址转换是存储管理的一个主要功能。所谓地址转换就是将用户的逻辑地址转换成内存的物理地址，完成地址重定位。需要指出的是，地址转换是操作系统的地址变换机构自行完成的，无需用">
+<meta property="og:updated_time" content="2016-04-02T05:31:11.453Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="操作系统 地址转换">
+<meta name="twitter:description" content="之前本科的时候操作系统学得还不错，不过这么些年没用过之后发现忘得差不多了，要不是因为最近几次笔试，可能都还没意识到。比如有道题目是需要计算操作系统的地址转换的，硬是想不起来是怎么算的了。看来有必要重新学一下了。
+在计算机操作系统中，地址转换是存储管理的一个主要功能。所谓地址转换就是将用户的逻辑地址转换成内存的物理地址，完成地址重定位。需要指出的是，地址转换是操作系统的地址变换机构自行完成的，无需用">
+  
+    <link rel="alternate" href="/atom.xml" title="Fantacity" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" integrity="sha384-XdYbMnZ/QjLh6iI4ogqCTaIjrFk87ip+ekIjefZch0Y+PvJ8CDYtEs1ipDmPorQ+" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="/css/styles.css">
+  
+
+</head>
+
+<body>
+  <nav class="navbar navbar-inverse">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="main-menu-navbar">
+      <ul class="nav navbar-nav">
+        
+          <li><a class=""
+                 href="/index.html">Home</a></li>
+        
+          <li><a class=""
+                 href="/archives/">Archives</a></li>
+        
+          <li><a class=""
+                 href="https://github.com/yosef-gao">Github</a></li>
+        
+          <li><a class=""
+                 href="/about/aboutme.html">About Me</a></li>
+        
+      </ul>
+
+      <!--
+      <ul class="nav navbar-nav navbar-right">
+        
+          <li><a href="/atom.xml" title="RSS Feed"><i class="fa fa-rss"></i></a></li>
+        
+      </ul>
+      -->
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+  <div class="container">
+    <div class="blog-header">
+  <h1 class="blog-title">Fantacity</h1>
+  
+    <p class="lead blog-description">Stand Alone Complex</p>
+  
+</div>
+
+    <div class="row">
+        <div class="col-sm-8 blog-main">
+          <article id="post-os-address-translate" class="article article-type-post" itemscope itemprop="blogPost">
+
+  <header class="article-header">
+    
+  
+    <h1 class="article-title" itemprop="name">
+      操作系统 地址转换
+    </h1>
+  
+
+
+  </header>
+
+  <div class="article-meta">
+    <div class="article-datetime">
+  <a href="/2016/03/26/os-address-translate/" class="article-date"><time datetime="2016-03-26T11:43:08.000Z" itemprop="datePublished">2016-03-26</time></a>
+</div>
+
+    <div class="article-author">yosef gao</div>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/ComputerScience/">ComputerScience</a>
+  </div>
+
+
+  </div>
+  <div class="article-inner">
+
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>之前本科的时候操作系统学得还不错，不过这么些年没用过之后发现忘得差不多了，要不是因为最近几次笔试，可能都还没意识到。比如有道题目是需要计算操作系统的地址转换的，硬是想不起来是怎么算的了。看来有必要重新学一下了。</p>
+<p>在计算机操作系统中，地址转换是存储管理的一个主要功能。所谓地址转换就是将用户的逻辑地址转换成内存的物理地址，完成地址重定位。需要指出的是，地址转换是操作系统的地址变换机构自行完成的，无需用户干预，这样我们使用操作系统时，才方便而可靠。</p>
+<a id="more"></a>
+<p>下面结合三个例题对地址转换作详细地分析。</p>
+<p><strong>【例1】</strong>考虑一个由8个页面，每页有1024个字节组成的逻辑空间，把它装入到有32个物理块的存储器中，问:（1）逻辑地址需要多少二进制位表示？(2）物理地址需要多少二进制位表示？</p>
+<p><strong>分析</strong> 在分页存储管理中，逻辑地址结构由两个部分组成：前一部分表示该地址所在页面的页号p；后一部分表示页内地址（页内位移）d。页号的地址位数决定了页的多少，假设页号有20位，则地址空间中最多可容纳的页面数为220，即1MB个页面。页内地址位数确定了每页的大小，若页内地址为12位，则每页大小为2<sup>12</sup>，即2KB。</p>
+<p>同理，物理地址中块号的地址位数决定了块的数量。由于页式存储管理内存空间块的大小与页面大小相同，所以物理地址中块内地址与逻辑地址中的页内地址位数相同。</p>
+<p><strong>解</strong>  因为页面数为8=23，故需要3位二进制数表示。每页有1024个字节，1024=210，于是页内地址需要10位二进制数表示。32个物理块，需要5位二进制数表示（32=25）。<br>（1）页的逻辑地址由页号和页内地址组成，所以需要3+10=13位二进制数表示。<br>（2）页的物理地址由块号和页内地址的拼接，所以需要5+10=15位二进制数表示。</p>
+<p><strong>【例2】</strong> 若在一分页存储管理系统中，某作业的页表如下所示。已知页面大小为1024字节，试将逻辑地址1011，2148，4000，5012转化为相应的物理地址。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">页号</th>
+<th style="text-align:center">块号</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">0</td>
+<td style="text-align:center">2</td>
+</tr>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center">3</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:center">6</td>
+</tr>
+</tbody>
+</table>
+<p><strong>分析</strong>  页式存储管理的地址结构是一维的，即逻辑地址（或物理地址）只用一个数值即可表示。若给定逻辑地址A，页面的大小为L，则页号p和页内地址d可按照下式求得：<br>p=int [A/L]  d=A mod L<br>其中，int是取整函数（取数值的整数部分），mod是取余函数（取数值的余数部分）。</p>
+<p>物理地址的计算公式为：<br>物理地址＝块的大小（即页的大小L）*块号f＋页内地址d</p>
+<p><strong>解</strong> 本题中，为了描述方便，设页号为p，页内位移为d，则：<br>（1）对于逻辑地址1011，p＝int（1011/1024）＝0，d＝1011 mod 1024＝1011。查页表第0页在第2块，所以物理地址为1024*2＋1011＝3059。<br>（2）对于逻辑地址2148，p＝int（2148/1024）＝2，d＝2148 mod 1024＝100。查页表第2页在第1块，所以物理地址为1024＋100＝1124。<br>（3）对于逻辑地址4000，p＝int（4000/1024）＝3，d＝4000 mod 1024＝928。查页表第3页在第6块，所以物理地址为1024*6＋928＝7072。<br>（4）对于逻辑地址5012，p＝int（5012/1024）＝4，d＝5012 mod 1024＝916。因页号超过页表长度，该逻辑地址非法。</p>
+<p><strong>【例3】</strong> 某虚拟存储器的用户编程空间共32个页面，每页为1KB，内存为16KB。假定某时刻一用户页表中已调入内存的页面的页号和物理块号的对照表如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">页号</th>
+<th style="text-align:center">物理块号</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">0</td>
+<td style="text-align:center">5</td>
+</tr>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center">10</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td style="text-align:center">4</td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:center">7</td>
+</tr>
+</tbody>
+</table>
+<p>则逻辑地址0A5C（H）所对应的物理地址是什么？</p>
+<p><strong>分析</strong> 页式存储管理的逻辑地址分为两部分：页号和页内地址。<br>由已知条件“用户编程空间共32个页面”，可知页号部分占5位；由“每页为1KB”，1K=210，可知内页地址占10位。由“内存为16KB”，可知有16块，块号为4位。<br>逻辑地址0A5C（H）所对应的二进制表示形式是：000 1010 0101 1100 ，根据上面的分析，下划线部分为页内地址，编码 “000 10” 为页号，表示该逻辑地址对应的页号为2。查页表，得到物理块号是4（十进制），即物理块地址为：01 00 ，拼接块内地址10 0101 1100，得01 0010 0101 1100，即125C（H）。</p>
+<p><strong>解</strong> 逻辑地址0A5C（H）所对应的物理地址是125C（H）。</p>
+
+      
+    </div>
+
+    
+      
+
+    
+
+    <footer class="article-footer">
+      <a data-url="http://yosef-gao.github.io/2016/03/26/os-address-translate/" data-id="cimiqgymp000cmjpg4podjavo" class="article-share-link">
+        <i class="fa fa-share"></i> Share
+      </a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/OS/">OS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/内存管理/">内存管理</a></li></ul>
+
+
+    </footer>
+  </div>
+  
+    
+<ul id="article-nav" class="nav nav-pills nav-justified">
+  
+  <li role="presentation">
+    <a href="/2016/03/23/cpp-array-and-pointer/" id="article-nav-older" class="article-nav-link-wrap">
+      <i class="fa fa-chevron-left pull-left"></i>
+      <span class="article-nav-link-title">C++ 中指针数组与数组指针</span>
+    </a>
+  </li>
+  
+  
+  <li role="presentation">
+    <a href="/2016/03/31/unix-time-function/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-link-title">UNIX下各时间函数之间的关系</span>
+      <i class="fa fa-chevron-right pull-right"></i>
+    </a>
+  </li>
+  
+</ul>
+
+
+  
+</article>
+
+
+
+
+        </div>
+        <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+          
+  <div class="sidebar-module sidebar-module-inset">
+  <h4>About</h4>
+  <p>Hi, I am yosef gao.</p>
+<p>Graduate student of Zhejiang University of technology.</p>
+<p>Major in Image and Graphics. Mainly use c/c++, familiar with c#.</p>
+<p>I’m now learing server development.</p>
+<p><i class="fa fa-user fa-fw"></i> <em>yosef gao</em><br><i class="fa fa-graduation-cap fa-fw"></i> <em>ZJUT</em><br><i class="fa fa-wechat fa-fw"></i> <em>perfect_means_shit</em><br><i class="fa fa-envelope fa-fw"></i> <a href="&#109;&#97;&#x69;&#108;&#x74;&#x6f;&#x3a;&#49;&#x30;&#51;&#x33;&#49;&#x33;&#49;&#54;&#x36;&#x30;&#x40;&#x71;&#113;&#46;&#x63;&#x6f;&#x6d;">&#49;&#x30;&#51;&#x33;&#49;&#x33;&#49;&#54;&#x36;&#x30;&#x40;&#x71;&#113;&#46;&#x63;&#x6f;&#x6d;</a></p>
+
+</div>
+
+
+  
+  <div class="sidebar-module">
+    <h4>Categories</h4>
+    <ul class="sidebar-module-list"><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/categories/ComputerScience/">ComputerScience</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/categories/Others/">Others</a><span class="sidebar-module-list-count">3</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/categories/Program/">Program</a><span class="sidebar-module-list-count">4</span></li></ul>
+  </div>
+
+
+
+  
+  <div class="sidebar-module">
+    <h4>Tags</h4>
+    <ul class="sidebar-module-list"><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/C/">C++</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/OS/">OS</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/bottle/">bottle</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/hexo/">hexo</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/linux/">linux</a><span class="sidebar-module-list-count">2</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/markdown/">markdown</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/mysql/">mysql</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/python/">python</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/sae/">sae</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/unix/">unix</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/zjut/">zjut</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/内存管理/">内存管理</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/指针数组/">指针数组</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/数组指针/">数组指针</a><span class="sidebar-module-list-count">1</span></li></ul>
+  </div>
+
+
+
+  
+  <div class="sidebar-module">
+    <h4>Tag Cloud</h4>
+    <p class="tagcloud">
+      <a href="/tags/C/" style="font-size: 10px;">C++</a> <a href="/tags/OS/" style="font-size: 10px;">OS</a> <a href="/tags/bottle/" style="font-size: 10px;">bottle</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/sae/" style="font-size: 10px;">sae</a> <a href="/tags/unix/" style="font-size: 10px;">unix</a> <a href="/tags/zjut/" style="font-size: 10px;">zjut</a> <a href="/tags/内存管理/" style="font-size: 10px;">内存管理</a> <a href="/tags/指针数组/" style="font-size: 10px;">指针数组</a> <a href="/tags/数组指针/" style="font-size: 10px;">数组指针</a>
+    </p>
+  </div>
+
+
+  
+  <div class="sidebar-module">
+    <h4>Archives</h4>
+    <ul class="sidebar-module-list"><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/archives/2016/04/">April 2016</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/archives/2016/03/">March 2016</a><span class="sidebar-module-list-count">7</span></li></ul>
+  </div>
+
+
+
+  
+  <div class="sidebar-module">
+    <h4>Recents</h4>
+    <ul class="sidebar-module-list">
+      
+        <li>
+          <a href="/2016/04/02/linux-c-threadpool/">简单Linux C线程池的实现</a>
+        </li>
+      
+        <li>
+          <a href="/2016/03/31/unix-time-function/">UNIX下各时间函数之间的关系</a>
+        </li>
+      
+        <li>
+          <a href="/2016/03/26/os-address-translate/">操作系统 地址转换</a>
+        </li>
+      
+        <li>
+          <a href="/2016/03/23/cpp-array-and-pointer/">C++ 中指针数组与数组指针</a>
+        </li>
+      
+        <li>
+          <a href="/2016/03/13/markdown/">Markdown 语法的简要规则</a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+
+        </div>
+    </div>
+  </div>
+  <footer class="blog-footer">
+  <div class="container">
+    <div id="footer-info" class="inner">
+      &copy; 2016 Yosef Gao<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+  
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+</body>
+</html>

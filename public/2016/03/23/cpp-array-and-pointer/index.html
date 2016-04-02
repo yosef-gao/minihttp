@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>C++ 中指针数组与数组指针 | Fantacity</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="前言C++当中指针是一个比较玄乎的东西，一段时间不用就弄不清楚了，昨天做笔试题目的时候就吧指针数组和数组指针搞混了。所以说，好记性不如烂笔头，重要的东西还是应该梳理一下整理下来，便于以后回顾。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ 中指针数组与数组指针">
+<meta property="og:url" content="http://yosef-gao.github.io/2016/03/23/cpp-array-and-pointer/index.html">
+<meta property="og:site_name" content="Fantacity">
+<meta property="og:description" content="前言C++当中指针是一个比较玄乎的东西，一段时间不用就弄不清楚了，昨天做笔试题目的时候就吧指针数组和数组指针搞混了。所以说，好记性不如烂笔头，重要的东西还是应该梳理一下整理下来，便于以后回顾。">
+<meta property="og:updated_time" content="2016-04-02T05:28:47.725Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C++ 中指针数组与数组指针">
+<meta name="twitter:description" content="前言C++当中指针是一个比较玄乎的东西，一段时间不用就弄不清楚了，昨天做笔试题目的时候就吧指针数组和数组指针搞混了。所以说，好记性不如烂笔头，重要的东西还是应该梳理一下整理下来，便于以后回顾。">
+  
+    <link rel="alternate" href="/atom.xml" title="Fantacity" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" integrity="sha384-XdYbMnZ/QjLh6iI4ogqCTaIjrFk87ip+ekIjefZch0Y+PvJ8CDYtEs1ipDmPorQ+" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="/css/styles.css">
+  
+
+</head>
+
+<body>
+  <nav class="navbar navbar-inverse">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="main-menu-navbar">
+      <ul class="nav navbar-nav">
+        
+          <li><a class=""
+                 href="/index.html">Home</a></li>
+        
+          <li><a class=""
+                 href="/archives/">Archives</a></li>
+        
+          <li><a class=""
+                 href="https://github.com/yosef-gao">Github</a></li>
+        
+          <li><a class=""
+                 href="/about/aboutme.html">About Me</a></li>
+        
+      </ul>
+
+      <!--
+      <ul class="nav navbar-nav navbar-right">
+        
+          <li><a href="/atom.xml" title="RSS Feed"><i class="fa fa-rss"></i></a></li>
+        
+      </ul>
+      -->
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+  <div class="container">
+    <div class="blog-header">
+  <h1 class="blog-title">Fantacity</h1>
+  
+    <p class="lead blog-description">Stand Alone Complex</p>
+  
+</div>
+
+    <div class="row">
+        <div class="col-sm-8 blog-main">
+          <article id="post-cpp-array-and-pointer" class="article article-type-post" itemscope itemprop="blogPost">
+
+  <header class="article-header">
+    
+  
+    <h1 class="article-title" itemprop="name">
+      C++ 中指针数组与数组指针
+    </h1>
+  
+
+
+  </header>
+
+  <div class="article-meta">
+    <div class="article-datetime">
+  <a href="/2016/03/23/cpp-array-and-pointer/" class="article-date"><time datetime="2016-03-23T07:06:02.000Z" itemprop="datePublished">2016-03-23</time></a>
+</div>
+
+    <div class="article-author">yosef gao</div>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Program/">Program</a>
+  </div>
+
+
+  </div>
+  <div class="article-inner">
+
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>C++当中指针是一个比较玄乎的东西，一段时间不用就弄不清楚了，昨天做笔试题目的时候就吧指针数组和数组指针搞混了。所以说，好记性不如烂笔头，重要的东西还是应该梳理一下整理下来，便于以后回顾。</p>
+<a id="more"></a>&gt;<br><br>指针数组<br>——–<br>指针数组： array of pointers，翻译成英文就比较好理解，其本质是一个数组，用于存储指针。<br><br><strong>int *p[4]</strong>: 由于<code>[]</code>的优先级较高，所以<code>p</code>先和<code>[]</code>结合，表示这是一个数组，再由<code>int*</code>说明这是一个整形指针数组，数组的容量为4。<br><br>数组指针<br>——–<br>数组指针： a pointer of an array，其本质是一个指针，指向一个数组。<br><br><strong>int (*p)[4]</strong>: 由于<code>()</code>的优先级更高，所以<code>p</code>先和<code>*</code>结合表示<code>p</code>是一个指针，指向一个<code>int</code>数组，其容量大小为4.<br><br>几个例子<br>———<br><figure class="highlight cpp"><figcaption><span>第一个例子</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> int_array[] = &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span> &#125;;</span><br><span class="line"><span class="keyword">int</span> *a[<span class="number">4</span>]; <span class="comment">// a是指针数组</span></span><br><span class="line"><span class="keyword">int</span>(*b)[<span class="number">4</span>] = &amp;int_array; <span class="comment">// b是数组指针</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; ++i)</span><br><span class="line">&#123;</span><br><span class="line">    a[i] = &amp;(*b)[i]; <span class="comment">// 把b中每一个元素的地址赋值给a</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出内容<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">0018FA14</span><br><span class="line">0018FA18</span><br><span class="line">0018FA1C</span><br><span class="line">0018FA20</span><br></pre></td></tr></table></figure></p>
+<div class="bs-callout bs-callout-info"><h4 id="注意"><a href="#注意" class="headerlink" title=" 注意"></a><i class="fa fa-info-circle"></i> 注意</h4><p>定义了数组指针，该指针指向这个数组的首地址，必须给指针指定一个地址。</p>
+</div>
+<figure class="highlight cpp"><figcaption><span>第二个例子</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> c[<span class="number">3</span>][<span class="number">4</span>] = &#123; <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="number">11</span>, <span class="number">12</span> &#125;;</span><br><span class="line"><span class="keyword">int</span>(*d)[<span class="number">4</span>] = c; <span class="comment">// 或&amp;(c[0])</span></span><br><span class="line">d++; <span class="comment">// 该语句执行过后，也就是d=d+1;d跨过行c[0]指向了行c[1]</span></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; ++i)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; (*d)[i] &lt;&lt; <span class="string">" "</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出内容：<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">5 6 7 8 4 4</span><br></pre></td></tr></table></figure></p>
+<div class="bs-callout bs-callout-info"><h4 id="注意"><a href="#注意" class="headerlink" title=" 注意"></a><i class="fa fa-info-circle"></i> 注意</h4><p>注意和上例中的区别，int(*d)[4] = c; 这里不可以加&amp;， 即&amp;(c[0]) = c，这里c的含义应该为指向一个“一维数组的指针”，等同于上例中&amp;int_array(指向一个以为数组的指针)。</p>
+</div>
+<figure class="highlight cpp"><figcaption><span>第三个例子</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="built_in">cout</span> &lt;&lt; <span class="keyword">sizeof</span>(a)/<span class="keyword">sizeof</span>(a[<span class="number">0</span>]) &lt;&lt; <span class="string">" "</span> &lt;&lt; <span class="keyword">sizeof</span>(b) &lt;&lt; <span class="built_in">endl</span>;</span><br></pre></td></tr></table></figure>
+<p>输出内容:<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">4 4</span><br></pre></td></tr></table></figure></p>
+<p>sizeof(a)/sizeof(a[0]) 得到的是数组的长度，即4;<br>sizeof(b) 得到的是一个指针的大小，在32位系统下是4(byte)</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>最后总结两句话：</p>
+<ol>
+<li>优先级 <code>()&gt;[]&gt;*</code></li>
+<li>定义了指针一定要知道指针指向哪里，不然要悲剧。</li>
+</ol>
+
+      
+    </div>
+
+    
+      
+
+    
+
+    <footer class="article-footer">
+      <a data-url="http://yosef-gao.github.io/2016/03/23/cpp-array-and-pointer/" data-id="cimiqgymi0009mjpgke5xv754" class="article-share-link">
+        <i class="fa fa-share"></i> Share
+      </a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/">C++</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/指针数组/">指针数组</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/数组指针/">数组指针</a></li></ul>
+
+
+    </footer>
+  </div>
+  
+    
+<ul id="article-nav" class="nav nav-pills nav-justified">
+  
+  <li role="presentation">
+    <a href="/2016/03/13/markdown/" id="article-nav-older" class="article-nav-link-wrap">
+      <i class="fa fa-chevron-left pull-left"></i>
+      <span class="article-nav-link-title">Markdown 语法的简要规则</span>
+    </a>
+  </li>
+  
+  
+  <li role="presentation">
+    <a href="/2016/03/26/os-address-translate/" id="article-nav-newer" class="article-nav-link-wrap">
+      <span class="article-nav-link-title">操作系统 地址转换</span>
+      <i class="fa fa-chevron-right pull-right"></i>
+    </a>
+  </li>
+  
+</ul>
+
+
+  
+</article>
+
+
+
+
+        </div>
+        <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+          
+  <div class="sidebar-module sidebar-module-inset">
+  <h4>About</h4>
+  <p>Hi, I am yosef gao.</p>
+<p>Graduate student of Zhejiang University of technology.</p>
+<p>Major in Image and Graphics. Mainly use c/c++, familiar with c#.</p>
+<p>I’m now learing server development.</p>
+<p><i class="fa fa-user fa-fw"></i> <em>yosef gao</em><br><i class="fa fa-graduation-cap fa-fw"></i> <em>ZJUT</em><br><i class="fa fa-wechat fa-fw"></i> <em>perfect_means_shit</em><br><i class="fa fa-envelope fa-fw"></i> <a href="&#109;&#97;&#x69;&#108;&#x74;&#x6f;&#x3a;&#49;&#x30;&#51;&#x33;&#49;&#x33;&#49;&#54;&#x36;&#x30;&#x40;&#x71;&#113;&#46;&#x63;&#x6f;&#x6d;">&#49;&#x30;&#51;&#x33;&#49;&#x33;&#49;&#54;&#x36;&#x30;&#x40;&#x71;&#113;&#46;&#x63;&#x6f;&#x6d;</a></p>
+
+</div>
+
+
+  
+  <div class="sidebar-module">
+    <h4>Categories</h4>
+    <ul class="sidebar-module-list"><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/categories/ComputerScience/">ComputerScience</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/categories/Others/">Others</a><span class="sidebar-module-list-count">3</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/categories/Program/">Program</a><span class="sidebar-module-list-count">4</span></li></ul>
+  </div>
+
+
+
+  
+  <div class="sidebar-module">
+    <h4>Tags</h4>
+    <ul class="sidebar-module-list"><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/C/">C++</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/OS/">OS</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/bottle/">bottle</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/hexo/">hexo</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/linux/">linux</a><span class="sidebar-module-list-count">2</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/markdown/">markdown</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/mysql/">mysql</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/python/">python</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/sae/">sae</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/unix/">unix</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/zjut/">zjut</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/内存管理/">内存管理</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/指针数组/">指针数组</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/数组指针/">数组指针</a><span class="sidebar-module-list-count">1</span></li></ul>
+  </div>
+
+
+
+  
+  <div class="sidebar-module">
+    <h4>Tag Cloud</h4>
+    <p class="tagcloud">
+      <a href="/tags/C/" style="font-size: 10px;">C++</a> <a href="/tags/OS/" style="font-size: 10px;">OS</a> <a href="/tags/bottle/" style="font-size: 10px;">bottle</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/sae/" style="font-size: 10px;">sae</a> <a href="/tags/unix/" style="font-size: 10px;">unix</a> <a href="/tags/zjut/" style="font-size: 10px;">zjut</a> <a href="/tags/内存管理/" style="font-size: 10px;">内存管理</a> <a href="/tags/指针数组/" style="font-size: 10px;">指针数组</a> <a href="/tags/数组指针/" style="font-size: 10px;">数组指针</a>
+    </p>
+  </div>
+
+
+  
+  <div class="sidebar-module">
+    <h4>Archives</h4>
+    <ul class="sidebar-module-list"><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/archives/2016/04/">April 2016</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/archives/2016/03/">March 2016</a><span class="sidebar-module-list-count">7</span></li></ul>
+  </div>
+
+
+
+  
+  <div class="sidebar-module">
+    <h4>Recents</h4>
+    <ul class="sidebar-module-list">
+      
+        <li>
+          <a href="/2016/04/02/linux-c-threadpool/">简单Linux C线程池的实现</a>
+        </li>
+      
+        <li>
+          <a href="/2016/03/31/unix-time-function/">UNIX下各时间函数之间的关系</a>
+        </li>
+      
+        <li>
+          <a href="/2016/03/26/os-address-translate/">操作系统 地址转换</a>
+        </li>
+      
+        <li>
+          <a href="/2016/03/23/cpp-array-and-pointer/">C++ 中指针数组与数组指针</a>
+        </li>
+      
+        <li>
+          <a href="/2016/03/13/markdown/">Markdown 语法的简要规则</a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+
+        </div>
+    </div>
+  </div>
+  <footer class="blog-footer">
+  <div class="container">
+    <div id="footer-info" class="inner">
+      &copy; 2016 Yosef Gao<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+  
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" integrity="sha384-8gBf6Y4YYq7Jx97PIqmTwLPin4hxIzQw5aDmUg/DDhul9fFpbbLcLh3nTIIDJKhx" crossorigin="anonymous"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+</body>
+</html>

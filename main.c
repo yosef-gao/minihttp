@@ -2,6 +2,8 @@
 #include "sysutil.h"
 #include "threadpool.h"
 
+#define ROOT_PATH "./public"
+
 extern char **environ;
 
 void* doit(void* arg);
@@ -158,18 +160,20 @@ void client_error(int fd, char *cause, char *err_num, char *short_msg, char *lon
 
 int parse_uri(char *uri, char *filename, char *cgiargs)
 {
-    char *ptr;
+    // char *ptr;
 
     if (!strstr(uri, "cgi-bin")) // static content
     {
         strcpy(cgiargs, "");
-        strcpy(filename, ".");
+        strcpy(filename, ROOT_PATH);
         strcat(filename, uri);
         if (uri[strlen(uri) - 1] == '/')
-            strcat(filename, "home.html");
+            strcat(filename, "index.html");
         return 1;
     }
     else // dynamic content
+        return 0;
+    /*
     {
         ptr = index(uri, '?');
         if (ptr)
@@ -184,7 +188,7 @@ int parse_uri(char *uri, char *filename, char *cgiargs)
             strcat(filename, uri);
             return 0;
         }
-    }
+    }*/
 
     return 0;
 }
